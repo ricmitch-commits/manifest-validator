@@ -13,7 +13,6 @@ data:
     metadata:
       name: manifest-validator
     spec:
-      version: v1.0.0
       init:
         command: ["/bin/sh", "-c"]
         args:
@@ -23,7 +22,7 @@ data:
             echo "All validation tools verified."
       discover:
         find:
-          glob: "**/*.yaml"
+          command: [sh, -c, 'find . -name "*.yaml" -o -name "*.yml" | grep -v "^\./\.git" | head -1']
       generate:
         command: ["/home/argocd/scripts/validate.sh"]
       preserveFileMode: false

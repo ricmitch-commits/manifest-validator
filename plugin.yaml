@@ -3,8 +3,6 @@ kind: ConfigManagementPlugin
 metadata:
   name: manifest-validator
 spec:
-  version: v1.0.0
-
   # Init command - setup environment and verify tools exist
   init:
     command: ["/bin/sh", "-c"]
