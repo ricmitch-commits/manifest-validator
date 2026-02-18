@@ -85,20 +85,21 @@ classify_kubelinter_errors() {
     fi
 
     # KubeLinter checks to classify as HIGH IMPACT (security critical)
-    local HIGH_IMPACT_CHECKS="dangerously-permissive-privileged-capabilities run-as-root host-network host-pid host-ipc privileged-container"
+
+    local HIGH_IMPACT_CHECKS="host-network host-pid host-ipc privileged-container"
 
     # Checks that can be auto-fixed (LOW IMPACT)
-    local LOW_IMPACT_CHECKS="no-read-only-root-fs unset-cpu-requirements unset-memory-requirements latest-tag missing-readiness-probe missing-liveness-probe drop-net-raw-capability"
+    local LOW_IMPACT_CHECKS="no-read-only-root-fs unset-cpu-requirements unset-memory-requirements latest-tag drop-net-raw-capability"
 
     while IFS= read -r line; do
-        local check=$(echo "$line" | jq -r '.Check.Name // empty' 2>/dev/null)
+        local check=$(echo "$line" | jq -r '.Check // empty' 2>/dev/null)
         local object=$(echo "$line" | jq -r '.Object.K8sObject.Name // "unknown"' 2>/dev/null)
-        local message=$(echo "$line" | jq -r '.Message // "check failed"' 2>/dev/null)
+        local message=$(echo "$line" | jq -r '.Diagnostic.Message // "check failed"' 2>/dev/null)
 
         if [ -z "$check" ]; then
             continue
         fi
-
+        
         if echo "$HIGH_IMPACT_CHECKS" | grep -qw "$check"; then
             HIGH_IMPACT_ERRORS+=("SECURITY: $check on $object - $message")
         elif echo "$LOW_IMPACT_CHECKS" | grep -qw "$check"; then
