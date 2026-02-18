@@ -1,0 +1,21 @@
+[
+  {
+    "op": "add",
+    "path": "/spec/repo/sidecarContainers/0/volumeMounts/-",
+    "value": {
+      "name": "cmp-plugin-config",
+      "mountPath": "/home/argocd/cmp-server/config/plugin.yaml",
+      "subPath": "plugin.yaml"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/spec/repo/volumes/-",
+    "value": {
+      "name": "cmp-plugin-config",
+      "configMap": {
+        "name": "manifest-validator-plugin"
+      }
+    }
+  }
+]

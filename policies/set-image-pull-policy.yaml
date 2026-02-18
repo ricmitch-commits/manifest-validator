@@ -1,0 +1,29 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: set-image-pull-policy
+  annotations:
+    policies.kyverno.io/title: Set Image Pull Policy
+    policies.kyverno.io/description: >-
+      Sets imagePullPolicy to IfNotPresent if not specified.
+spec:
+  rules:
+    - name: set-image-pull-policy-ifnotpresent
+      match:
+        any:
+          - resources:
+              kinds:
+                - Deployment
+                - StatefulSet
+                - DaemonSet
+                - Job
+      mutate:
+        foreach:
+          - list: "request.object.spec.template.spec.containers"
+            patchStrategicMerge:
+              spec:
+                template:
+                  spec:
+                    containers:
+                      - name: "{{ element.name }}"
+                        +(imagePullPolicy): "IfNotPresent"

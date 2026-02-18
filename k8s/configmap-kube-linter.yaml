@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cmp-kube-linter-config
+  namespace: openshift-gitops
+  labels:
+    app.kubernetes.io/name: manifest-validator
+    app.kubernetes.io/component: config
+data:
+  kube-linter.yaml: |
+    checks:
+      include:
+        # Security checks (HIGH IMPACT)
+        - "host-network"
+        - "host-pid"
+        - "host-ipc"
+        - "privileged-container"
+        # Best practice checks (LOW IMPACT)
+        - "no-read-only-root-fs"
+        - "unset-cpu-requirements"
+        - "unset-memory-requirements"
+        - "latest-tag"
+        - "drop-net-raw-capability"
+      exclude:
+        - "required-annotation-email"
+        - "required-label-owner"
+        - "env-var-secret"

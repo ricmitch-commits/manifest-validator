@@ -1,0 +1,26 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: manifest-validator
+  namespace: openshift-gitops
+  labels:
+    app.kubernetes.io/name: manifest-validator
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: manifest-validator:v1.0.0
+  source:
+    type: Binary
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: manifest-validator
+  namespace: openshift-gitops
+  labels:
+    app.kubernetes.io/name: manifest-validator

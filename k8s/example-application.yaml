@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: my-app
+  namespace: openshift-gitops
+spec:
+  project: default
+
+  source:
+    # Use the CMP plugin for manifest generation
+    plugin:
+      name: manifest-validator
+      env:
+        - name: KUBERNETES_VERSION
+          value: "1.28.0"
+        - name: TARGET_KUBERNETES_VERSION
+          value: "v1.29.0"
+
+    # Your Git repository
+    repoURL: git@github.com:your-org/your-repo.git
+    path: manifests/
+    targetRevision: main
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: my-app-ns
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

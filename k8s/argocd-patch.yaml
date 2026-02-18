@@ -1,0 +1,102 @@
+apiVersion: argoproj.io/v1beta1
+kind: ArgoCD
+metadata:
+  name: openshift-gitops
+  namespace: openshift-gitops
+spec:
+  repo:
+    # Volumes for CMP sidecar
+    volumes:
+      # Plugin configuration
+      - name: cmp-plugin-config
+        configMap:
+          name: manifest-validator-plugin
+      # KubeLinter configuration
+      - name: cmp-kube-linter-config
+        configMap:
+          name: cmp-kube-linter-config
+      # Git SSH key for rollback
+      - name: cmp-git-ssh-key
+        secret:
+          secretName: cmp-git-ssh-key
+          defaultMode: 0400
+          items:
+            - key: ssh-privatekey
+              path: id_rsa
+            - key: known_hosts
+              path: known_hosts
+      # CMP temporary directory
+      - name: cmp-tmp
+        emptyDir: {}
+
+    # CMP Sidecar Container
+    sidecarContainers:
+      - name: manifest-validator
+        # Custom image with all validation tools
+        # Using local registry (default-route-openshift-image-registry)
+        image: image-registry.openshift-image-registry.svc:5000/openshift-gitops/manifest-validator:v1.0.0
+        imagePullPolicy: Always
+
+        # ArgoCD CMP server entrypoint (provided by init container)
+        command: ["/var/run/argocd/argocd-cmp-server"]
+
+        # Security context - runs as argocd user (999)
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 999
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+
+        # Environment variables
+        env:
+          - name: KUBERNETES_VERSION
+            value: "1.28.0"
+          - name: TARGET_KUBERNETES_VERSION
+            value: "v1.29.0"
+          - name: GIT_SSH_KEY_PATH
+            value: "/home/argocd/.ssh/id_rsa"
+          - name: GIT_USER_EMAIL
+            valueFrom:
+              configMapKeyRef:
+                name: cmp-git-config
+                key: GIT_USER_EMAIL
+          - name: GIT_USER_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: cmp-git-config
+                key: GIT_USER_NAME
+
+        # Resource limits
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+
+        # Volume mounts
+        volumeMounts:
+          # ArgoCD runtime files (copyutil init container provides this)
+          - name: var-files
+            mountPath: /var/run/argocd
+          # Plugin socket directory (use existing 'plugins' volume shared with repo-server)
+          - name: plugins
+            mountPath: /home/argocd/cmp-server/plugins
+          # Plugin configuration
+          - name: cmp-plugin-config
+            mountPath: /home/argocd/cmp-server/config/plugin.yaml
+            subPath: plugin.yaml
+          # KubeLinter config
+          - name: cmp-kube-linter-config
+            mountPath: /home/argocd/config/kube-linter.yaml
+            subPath: kube-linter.yaml
+          # SSH key for git operations
+          - name: cmp-git-ssh-key
+            mountPath: /home/argocd/.ssh
+            readOnly: true
+          # Temporary directory
+          - name: cmp-tmp
+            mountPath: /tmp

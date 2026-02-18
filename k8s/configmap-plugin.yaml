@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: manifest-validator-plugin
+  namespace: openshift-gitops
+  labels:
+    app.kubernetes.io/name: manifest-validator
+    app.kubernetes.io/component: config
+data:
+  plugin.yaml: |
+    apiVersion: argoproj.io/v1alpha1
+    kind: ConfigManagementPlugin
+    metadata:
+      name: manifest-validator
+    spec:
+      version: v1.0.0
+      init:
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            echo "Initializing manifest-validator..."
+            kubeconform -v && pluto version && kube-linter version && kyverno version
+            echo "All validation tools verified."
+      discover:
+        find:
+          glob: "**/*.yaml"
+      generate:
+        command: ["/home/argocd/scripts/validate.sh"]
+      preserveFileMode: false

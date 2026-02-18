@@ -1,0 +1,52 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: set-security-context-defaults
+  annotations:
+    policies.kyverno.io/title: Set Security Context Defaults
+    policies.kyverno.io/description: >-
+      Sets secure defaults for pod and container security contexts.
+spec:
+  rules:
+    - name: add-pod-security-context
+      match:
+        any:
+          - resources:
+              kinds:
+                - Deployment
+                - StatefulSet
+                - DaemonSet
+                - Job
+      mutate:
+        patchStrategicMerge:
+          spec:
+            template:
+              spec:
+                +(securityContext):
+                  runAsNonRoot: true
+                  seccompProfile:
+                    type: RuntimeDefault
+
+    - name: add-container-security-context
+      match:
+        any:
+          - resources:
+              kinds:
+                - Deployment
+                - StatefulSet
+                - DaemonSet
+                - Job
+      mutate:
+        foreach:
+          - list: "request.object.spec.template.spec.containers"
+            patchStrategicMerge:
+              spec:
+                template:
+                  spec:
+                    containers:
+                      - name: "{{ element.name }}"
+                        +(securityContext):
+                          allowPrivilegeEscalation: false
+                          capabilities:
+                            drop:
+                              - ALL

@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ConfigManagementPlugin
+metadata:
+  name: manifest-validator
+spec:
+  version: v1.0.0
+
+  # Init command - setup environment and verify tools exist
+  init:
+    command: ["/bin/sh", "-c"]
+    args:
+      - |
+        echo "Initializing manifest-validator..."
+        command -v kubeconform || exit 1
+        command -v pluto || exit 1
+        command -v kube-linter || exit 1
+        command -v kyverno || exit 1
+        echo "All validation tools found."
+
+  # Discover command - match directories with deployment.yaml or any common K8s manifest
+  discover:
+    find:
+      command: [sh, -c, "find . -name '*.yaml' | head -1"]
+
+  # Generate command - main validation and fix pipeline
+  generate:
+    command: ["/home/argocd/scripts/validate.sh"]
+
+  # Allow git credentials for rollback commits
+  preserveFileMode: false

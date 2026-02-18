@@ -1,0 +1,60 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: add-default-probes
+  annotations:
+    policies.kyverno.io/title: Add Default Health Probes
+    policies.kyverno.io/description: >-
+      Adds default liveness and readiness probes to containers that don't have them.
+      Uses TCP socket probe on port 8080 as a safe default.
+spec:
+  rules:
+    - name: add-liveness-probe
+      match:
+        any:
+          - resources:
+              kinds:
+                - Deployment
+                - StatefulSet
+                - DaemonSet
+      mutate:
+        foreach:
+          - list: "request.object.spec.template.spec.containers"
+            patchStrategicMerge:
+              spec:
+                template:
+                  spec:
+                    containers:
+                      - name: "{{ element.name }}"
+                        +(livenessProbe):
+                          tcpSocket:
+                            port: 8080
+                          initialDelaySeconds: 30
+                          periodSeconds: 10
+                          timeoutSeconds: 5
+                          failureThreshold: 3
+
+    - name: add-readiness-probe
+      match:
+        any:
+          - resources:
+              kinds:
+                - Deployment
+                - StatefulSet
+                - DaemonSet
+      mutate:
+        foreach:
+          - list: "request.object.spec.template.spec.containers"
+            patchStrategicMerge:
+              spec:
+                template:
+                  spec:
+                    containers:
+                      - name: "{{ element.name }}"
+                        +(readinessProbe):
+                          tcpSocket:
+                            port: 8080
+                          initialDelaySeconds: 5
+                          periodSeconds: 5
+                          timeoutSeconds: 3
+                          successThreshold: 1

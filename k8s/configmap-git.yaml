@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cmp-git-config
+  namespace: openshift-gitops
+  labels:
+    app.kubernetes.io/name: manifest-validator
+    app.kubernetes.io/component: config
+data:
+  GIT_USER_EMAIL: "ricmitch@redhat.com"
+  GIT_USER_NAME: "ricmitch-commits"
+  GIT_SSH_KEY_PATH: "/home/argocd/.ssh/id_rsa"

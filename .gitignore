@@ -1,0 +1,2 @@
+# SSH keys and secrets
+k8s/secret-ssh-key.yaml

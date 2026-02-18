@@ -1,0 +1,26 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: add-default-labels
+  annotations:
+    policies.kyverno.io/title: Add Default Labels
+    policies.kyverno.io/description: >-
+      Adds standard Kubernetes labels to resources that are missing them.
+spec:
+  rules:
+    - name: add-app-kubernetes-io-labels
+      match:
+        any:
+          - resources:
+              kinds:
+                - Deployment
+                - StatefulSet
+                - DaemonSet
+                - Service
+                - ConfigMap
+                - Secret
+      mutate:
+        patchStrategicMerge:
+          metadata:
+            labels:
+              +(app.kubernetes.io/managed-by): "argocd"

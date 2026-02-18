@@ -1,0 +1,66 @@
+checks:
+  # Include security and best practice checks
+  include:
+    # Security checks (HIGH IMPACT - will trigger rollback)
+    - "host-network"
+    - "host-pid"
+    - "host-ipc"
+    - "privileged-container"
+
+    # Best practice checks (LOW IMPACT - will be auto-fixed)
+    - "no-read-only-root-fs"
+    - "unset-cpu-requirements"
+    - "unset-memory-requirements"
+    - "latest-tag"
+    - "drop-net-raw-capability"
+
+  # Exclude checks that are too noisy or not applicable
+  exclude:
+    - "required-annotation-email"
+    - "required-label-owner"
+    - "env-var-secret"
+
+
+### Beacuse claude code included some invalid checks, I figured I'd add the legit ones here
+    
+#Default Enabled Checks
+#dangling-service: Indicates when services do not have any associated deployments.
+#deprecated-service-account-field: Flags use of the deprecated serviceAccount field (use serviceAccountName instead).
+#docker-sock: Alerts on deployments with docker.sock mounted in containers, which can allow for host control.
+#drop-net-raw-capability: Indicates when containers do not drop the NET_RAW capability.
+#duplicate-env-var: Ensures that duplicate named environment variables are not passed to a deployment.
+#env-var-secret: Indicates when raw secrets are used in environment variables, recommending file mounts or secretKeyRef instead.
+#host-ipc: Alerts on pods/deployment-likes that share the host's IPC namespace.
+#host-network: Alerts on pods/deployment-likes that share the host's network namespace.
+#host-pid: Alerts on pods/deployment-likes that share the host's process namespace.
+#invalid-target-ports: Indicates when deployments or services use port names that violate specifications (RFC 6335).
+#job-ttl-seconds-after-finished: Checks ttlSecondsAfterFinished for standalone Jobs (should be set) and CronJobs (should be unset).
+#latest-tag: Indicates when a container uses the latest image tag instead of a specific version.
+#liveness-port: Indicates when a liveness probe targets a port that is not exposed.
+#mismatching-selector: Flags when deployment selectors fail to match the pod template labels.
+#no-anti-affinity: Ensures deployments with multiple replicas specify inter-pod anti-affinity.
+#no-extensions-v1beta: Indicates when objects use deprecated API versions under extensions/v1beta.
+#no-read-only-root-fs: Indicates when containers are running without a read-only root filesystem.
+#non-existent-service-account: Flags when pods reference a service account that does not exist.
+#pdb-max-unavailable / pdb-min-available: Checks PodDisruptionBudgets for values that would prevent all disruptions.
+#pdb-unhealthy-pod-eviction-policy: Recommends explicitly setting unhealthyPodEvictionPolicy to AlwaysAllow.
+#privilege-escalation-container: Alerts on containers that allow privilege escalation.
+#privileged-container: Indicates when containers run in privileged mode.
+#readiness-port: Indicates when a readiness probe targets a port that is not exposed.
+#run-as-non-root: Ensures containers are configured to run as a non-root user.
+#sensitive-host-mounts: Alerts on containers with sensitive host system directories mounted.
+#ssh-port: Indicates when port 22 is exposed.
+#startup-port: Indicates when a startup probe targets a port that is not exposed.
+#unsafe-sysctls: Alerts on deployments specifying unsafe sysctls.
+#unset-cpu-requirements: Flags containers without CPU requests and limits set.
+#unset-memory-requirements: Flags containers without memory requests and limits set. 
+
+#Notable Disabled Checks (can be enabled via configuration) 
+#access-to-secrets: Restricts access to secrets to the smallest possible group of users.
+#default-service-account: Indicates when pods use the default service account, recommending a dedicated one.
+#no-liveness-probe: Recommends specifying a liveness probe in containers.
+#no-readiness-probe: Recommends specifying a readiness probe in containers.
+#read-secret-from-env-var: Recommends reading secrets from mounted files over environment variables.
+#schema-validation: Validates Kubernetes resources against their schemas using kubeconform.
+#use-namespace: Ensures resources are not deployed to the default namespace. 
+    
