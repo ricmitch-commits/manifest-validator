@@ -6,8 +6,6 @@ source /home/argocd/scripts/utils.sh
 WORK_DIR="$1"
 CONFIG_FILE="/home/argocd/config/kube-linter.yaml"
 
-log_info "KubeLinter: checking best practices and security"
-
 if [ -f "$CONFIG_FILE" ]; then
     kube-linter lint "$WORK_DIR" --config "$CONFIG_FILE" --format json
 else

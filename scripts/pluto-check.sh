@@ -4,9 +4,6 @@ set -uo pipefail
 source /home/argocd/scripts/utils.sh
 
 WORK_DIR="$1"
-TARGET_K8S_VERSION="${TARGET_KUBERNETES_VERSION:-v1.29.0}"
-
-log_info "Pluto: checking for deprecated APIs against Kubernetes $TARGET_K8S_VERSION"
 
 pluto detect-files \
     -d "$WORK_DIR" \

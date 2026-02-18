@@ -38,11 +38,15 @@ log_info "Found $(echo "$YAML_FILES" | wc -l | tr -d ' ') YAML files to validate
 
 # Run Kubeconform (schema validation)
 log_info "Running Kubeconform schema validation..."
+K8S_VERSION="${KUBERNETES_VERSION:-1.28.0}"
+log_info "Kubeconform: validating against Kubernetes $K8S_VERSION schema"
 /home/argocd/scripts/kubeconform-check.sh "$WORK_DIR" > /tmp/kubeconform-output.json 2>&1 || true
 classify_kubeconform_errors /tmp/kubeconform-output.json
 
 # Run Pluto (deprecated API detection)
 log_info "Running Pluto deprecated API detection..."
+TARGET_K8S_VERSION="${TARGET_KUBERNETES_VERSION:-v1.29.0}"
+log_info "Pluto: checking for deprecated APIs against Kubernetes $TARGET_K8S_VERSION"
 /home/argocd/scripts/pluto-check.sh "$WORK_DIR" > /tmp/pluto-output.json 2>&1 || true
 classify_pluto_errors /tmp/pluto-output.json
 
