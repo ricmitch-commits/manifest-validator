@@ -8,5 +8,5 @@ metadata:
     app.kubernetes.io/component: config
 data:
   GIT_USER_EMAIL: "ricmitch@redhat.com"
-  GIT_USER_NAME: "ricmitch-commits"
+  GIT_USER_NAME: "Richard Mitchell"
   GIT_SSH_KEY_PATH: "/home/argocd/.ssh/id_rsa"

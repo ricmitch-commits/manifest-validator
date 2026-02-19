@@ -4,6 +4,8 @@ set -uo pipefail
 source /home/argocd/scripts/utils.sh
 
 WORK_DIR="$1"
+K8S_VERSION="${KUBERNETES_VERSION:-1.28.0}"
+
 
 # Run kubeconform in strict mode to catch all schema violations including missing required fields
 # -strict: Enforce strict validation (additional properties not allowed)

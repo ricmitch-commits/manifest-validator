@@ -19,7 +19,7 @@ spec:
       - name: cmp-git-ssh-key
         secret:
           secretName: cmp-git-ssh-key
-          defaultMode: 0400
+          defaultMode: 0444
           items:
             - key: ssh-privatekey
               path: id_rsa
